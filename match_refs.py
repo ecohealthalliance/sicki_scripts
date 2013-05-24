@@ -15,9 +15,9 @@ if __name__ == '__main__':
     for next in reader:
         refs = json.loads (next[17])
         for ref in refs:
-            reference = mongo.refs.find_one ({'rights': str (ref)})
+            reference = mongo.refs.find_one ({'rights': int (ref)})
             if reference:
                 mongo.events.update ({'eid_id': int (next[1])},
-                                     {'$push': {'references': reference['key']}})
+                                     {'$push': {'references': reference['_id']}})
                 
 

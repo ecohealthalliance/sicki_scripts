@@ -7,7 +7,6 @@ from sys import argv
 import csv
 
 import simplejson as json
-from shapely.geometry import asShape
 
 if __name__ == '__main__':
     #passwd = getpass ("Password: ")
@@ -15,13 +14,15 @@ if __name__ == '__main__':
     #mongo.authenticate('skapes', passwd)
  
     results = mongo.orig_events.find ()
-   
+
     for item in results:
         mongo.events.update ({
                 'ref': item['_id'],
                 }, {
                 '$set': {
-                    'references': []
-                    }
+                    'references': [],
+                    'orig_event': item['_id']
+                    },
+                '$unset': {'ref': 1}
                 })
  
