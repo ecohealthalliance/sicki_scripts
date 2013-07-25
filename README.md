@@ -15,9 +15,9 @@ The goal of these scripts is to ensure we can reproduce any modifications we mak
 ## Sicki Scripts:
 
 ### add_centroid.py
-what: centroid of geojson objects 
-from: centroid calculated from Maps_Projected/maps 
-to: events.centroid 
+what: centroid of geojson objects  
+from: centroid calculated from Maps_Projected/maps  
+to: events.centroid  
 
 ### add_refs.py
 what: blank list of ref ids
