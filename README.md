@@ -74,6 +74,11 @@ to: maps.geodata
 what: add geojson to the events, this is for the individual events maps  
 from: ../sicki_maps/file.json  
 to: maps.geodata  
+
+### move_fields_to_proposals.py  
+what: move fields from eid collection to proposals and make the fields arrays of proposal references  
+from: eid  
+to: eid, proposal  
   
 ### orig.py  
 what: loads data from original csv file  
