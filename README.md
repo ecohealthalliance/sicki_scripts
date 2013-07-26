@@ -12,6 +12,15 @@ The goal of these scripts is to ensure we can reproduce any modifications we mak
  EHA Internal Spreadsheet - prepared by Carlos/Nico & predecessors  
  n = 475  
 
+## Steps
+1. Load original dataset
+    python orig.py CCM_EIDDatabase_041005.csv
+This will create the database eids and the collection orig_events
+2. Create the initial field names
+    python init_move.py
+
+X. Add data from the Jones Supplementary info
+   
 ## Sicki Scripts:
 
 ### add_centroid.py
@@ -51,7 +60,7 @@ to: events.event_name
   
 ### jones2mongo.py  
 what: join on field eid_id and import all of match_key as json object in field ‘jones’  
-from: /Dropbox/sicki/match-key.csv  
+from: /Dropbox/sicki/match-key.csv
 to: events.jones  
   
 ### location.py  
