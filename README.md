@@ -59,6 +59,11 @@ what: set the original location
 from: events_orig.PathEmerge_Location  
 to: events.location  
   
+### make_pathogens_singular.py  
+what: rename pathogens field to pathogen  
+from: eid  
+to: eid  
+
 ### match_refs.py   
 what: match references list on the rights field then adds the zotero_id  
  perhaps also with match_key.csv  
