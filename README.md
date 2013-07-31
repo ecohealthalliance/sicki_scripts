@@ -4,11 +4,11 @@ The goal of these scripts is to ensure we can reproduce any modifications we mak
 
 ## Source spreadsheets:
 
-1. match-key.csv 
+1. match-key.csv  
  Jones et al. Supplemental Appendix - prepared by Nico  
  n = 333  
 
-2. CCM_EIDDatabase_041005 
+2. CCM_EIDDatabase_041005  
  EHA Internal Spreadsheet - prepared by Carlos/Nico & predecessors  
  n = 475  
 
