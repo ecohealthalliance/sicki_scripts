@@ -84,6 +84,11 @@ to: maps.geodata
 what: move fields from eid collection to proposals and make the fields arrays of proposal references  
 from: eid  
 to: eid, proposal  
+
+### non_mongo_proposal_ids.py  
+what: convert mongo object ids to hex for proposals  
+from: eid, proposal  
+to:  eid, proposal
   
 ### orig.py  
 what: loads data from original csv file  
