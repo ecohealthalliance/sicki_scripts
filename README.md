@@ -85,6 +85,11 @@ what: move fields from eid collection to proposals and make the fields arrays of
 from: eid  
 to: eid, proposal  
 
+### move_refs_to_proposals.py  
+what: move fields from reference collection to proposals and make the fields arrays of proposal ids  
+from: reference  
+to: reference, proposal  
+
 ### non_mongo_proposal_ids.py  
 what: convert mongo object ids to hex for proposals  
 from: eid, proposal  
