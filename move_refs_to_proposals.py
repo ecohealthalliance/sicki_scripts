@@ -11,6 +11,7 @@ for row in refs:
         if field != '_id':
             proposal_id = str(bson.ObjectId())
             proposal.insert({'_id': proposal_id,
+                             'value': value,
                              'source': 'zotero',
                              'date': time.time(),
                              'accepted': True})
