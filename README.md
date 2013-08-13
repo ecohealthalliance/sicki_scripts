@@ -14,6 +14,11 @@ The goal of these scripts is to ensure we can reproduce any modifications we mak
 
 ## Sicki Scripts:
 
+### add_accepted_date_tp_ref_proposals.py  
+what: accepted dates to proposals for original zotero references  
+from: proposal  
+to: proposal  
+
 ### add_centroid.py
 what: centroid of geojson objects  
 from: centroid calculated from Maps_Projected/maps  
