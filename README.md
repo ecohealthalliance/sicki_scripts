@@ -26,6 +26,11 @@ X. Add data from the Jones Supplementary info
    
 ## Sicki Scripts:
 
+### add_accepted_date_tp_ref_proposals.py  
+what: accepted dates to proposals for original zotero references  
+from: proposal  
+to: proposal  
+
 ### add_centroid.py
 what: centroid of geojson objects  
 from: centroid calculated from Maps_Projected/maps  
@@ -71,6 +76,11 @@ what: set the original location
 from: events_orig.PathEmerge_Location  
 to: events.location  
   
+### make_pathogens_singular.py  
+what: rename pathogens field to pathogen  
+from: eid  
+to: eid  
+
 ### match_refs.py   
 what: match references list on the rights field then adds the zotero_id  
  perhaps also with match_key.csv  
@@ -86,6 +96,21 @@ to: maps.geodata
 what: add geojson to the events, this is for the individual events maps  
 from: ../sicki_maps/file.json  
 to: maps.geodata  
+
+### move_fields_to_proposals.py  
+what: move fields from eid collection to proposals and make the fields arrays of proposal references  
+from: eid  
+to: eid, proposal  
+
+### move_refs_to_proposals.py  
+what: move fields from reference collection to proposals and make the fields arrays of proposal ids  
+from: reference  
+to: reference, proposal  
+
+### non_mongo_proposal_ids.py  
+what: convert mongo object ids to hex for proposals  
+from: eid, proposal  
+to:  eid, proposal
   
 ### orig.py  
 what: loads data from original csv file  
