@@ -16,8 +16,11 @@ The goal of these scripts is to ensure we can reproduce any modifications we mak
 1. Load original dataset
     python orig.py CCM_EIDDatabase_041005.csv
 This will create the database eids and the collection orig_events
+
 2. Create the initial field names
     python init_move.py
+
+3. 
 
 X. Add data from the Jones Supplementary info
    
