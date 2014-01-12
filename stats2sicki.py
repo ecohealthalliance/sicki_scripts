@@ -7,160 +7,150 @@ db = pymongo.Connection('localhost', 27017)['sicki2']
 event = db.event
 #host = db.host
 #location = db.location
-#meta = db.meta
+#'metaData': metaData = db.'metaData': metaData
 #metrics = db.metrics
 #pathogen = db.pathogen
 
 # update entries from the other collections
 eid_events = event.find()
 
+metaData = {
+  'rank' : {
+    'eha': True,
+    'expert': False,
+    'top': True,
+    'auto': False
+  },
+  'votes': {
+    'up': 0, 
+    'down': 0
+  },
+  'userId': 0,
+  'reviewer': 'eha',
+  'submitted': time.time()
+}
+
+print metaData
+
+
 #dates = ['startDate','startDateISO','refStartDate','endDate','endDateISO','refEndDate']
 
 for eid in eid_events:
-    print eid['eventName']
+    #print eid['eventName']
 
     # Load host
     cursor = db.host.find ({'eventName': eid['eventName']})
     for value in cursor:
         eid_host = value
-        print eid_host['hostTaxOrder']
+        #print eid_host['hostTaxOrder']
 
     # Load economics
     cursor = db.economics.find ({'eventName': eid['eventName']})
     for value in cursor:
         eid_economics = value
-        print eid_economics['avgAgeDeath']
+        #print eid_economics['avgAgeDeath']
 
     # Load pathogens
     cursor = db.pathogen.find ({'eventName': eid['eventName']})
     for value in cursor:
         eid_pathogen = value
-        print eid_pathogen['pathogenClass']
+        #print eid_pathogen['pathogenClass']
 
     # Load locations
     cursor = db.location.find ({'eventName': eid['eventName']})
     for value in cursor:
         eid_location = value
-        print eid_location['locationNation']
+        #print eid_location['locationNation']
 
         id = eid.get('_id')
+
         eid_body = {
-        'eidID': eid['eidID'],
-        'eventName': eid['eventName'],
+        'metaData': {
+          'rank' : {
+            'eha': True,
+            'expert': False,
+            'top': True,
+            'auto': False
+          },
+          'votes': {
+            'up': 0, 
+            'down': 0
+          },
+          'userId': 0,
+          'reviewer': eid['reviewer'],
+          'submitted': time.time()
+        },
+
+        'commentsCount': 0, #Calculated field
+        'refsCount': 0, #Calculated field
+        'refs': [], #Calculated field
+
+        'sickiID':{
+        'value': eid['eidID'],
+        'ref': 'jones',
+        'metaData': metaData
+        },
+
+
+
+        'eventName':{
+        'value': eid['eventName'],
+        'ref': 'jones',
+        'metaData': metaData
+        },
+
         'disease':{
         'value': eid['disease'],
         'ref': eid['refDisease'],
-        'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-        'userId': 1,
-        'author': eid['reviewer'],
-        'submitted': time.time()
+        'metaData': metaData
         },
+
         'eid':{
         'value': eid['eid'],
         'ref': eid['refEID'],
-        'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+        'metaData': metaData
         },
 
         'eidCategory':{
         'value': eid['eidCategory'],
         'ref': eid['refEIDCategory'],
-        'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+        'metaData': metaData
         },
 
         'abstract': {
         'value': eid['Abstract'],
         'ref': eid['refAbstract'],
-        'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+        'metaData': metaData
         },
 
         'notes': {
         'value': eid['notes'],
         'ref': eid['refNotes'],
-        'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+        'metaData': metaData
         },
 
         'transmissionModel': {
         'value': eid['transitionModel'],
         'ref': eid['refTransitionModel'],
-        'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+        'metaData': metaData
         },
 
         'zoonoticType': {
         'value': eid['zoonoticType'],
         'ref': eid['refZoonoticType'],
-        'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+        'metaData': metaData
         },
 
         'sampleType': {
         'value': eid['sampleType'],
         'ref': eid['refSampleType'],
-        'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+        'metaData': metaData
         },
 
         'driver': {
         'value': eid['driver'],
         'ref': eid['refDriver'],
-        'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+        'metaData': metaData
         },
 
         ## Pathogens
@@ -168,118 +158,55 @@ for eid in eid_events:
             'drugResistance': {
             'value': eid_pathogen['pathogenDrugResistance'],
             'ref': eid_pathogen['refPathogenDrugResistance'],
-            'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+            'metaData': metaData
             },
 
             'reportedName': {
             'value': eid_pathogen['pathogenReportedName'],
             'ref': eid_pathogen['refPathogenReportedName'],
-            'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+            'metaData': metaData
             },
 
             'class': {
             'value': eid_pathogen['pathogenClass'],
             'ref': eid_pathogen['refPathogenClass'],
-            'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+            'metaData': metaData
             },
 
             'family': {
             'value': eid_pathogen['pathogenFamily'],
             'ref': eid_pathogen['refPathogenFamily'],
-            'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+            'metaData': metaData
             },
 
             'species': {
             'value': eid_pathogen['pathogenSpecies'],
             'ref': eid_pathogen['refPathogenSpecies'],
-            'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+            'metaData': metaData
             },
 
             'authority': {
             'value': eid_pathogen['pathogenAuthority'],
             'ref': eid_pathogen['refPathogenAuthority'],
-            'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+            'metaData': metaData
             },
 
             'taxOrder': {
             'value': eid_pathogen['pathogenTaxOrder'],
             'ref': eid_pathogen['refPathogenTaxOrder'],
-            'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+            'metaData': metaData
             },
 
             'genus': {
             'value': eid_pathogen['pathogenGenus'],
             'ref': eid_pathogen['refPathogenGenus'],
-            'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+            'metaData': metaData
             },
 
             'subSpecies': {
             'value': eid_pathogen['pathogenSubSpecies'],
             'ref': eid_pathogen['refPathogenSubSpecies'],
-            'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+            'metaData': metaData
             }
         }, #pathogens
 
@@ -288,105 +215,49 @@ for eid in eid_events:
             'name': {
             'value': eid_location['locationLocationName'],
             'ref': eid_location['refLocationLocationName'],
-            'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+            'metaData': metaData
             },
 
             'placeName': {
             'value': eid_location['locationPlaceName'],
             'ref': eid_location['refLocationPlaceName'],
-            'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+            'metaData': metaData
             },
 
             'latitude': {
             'value': eid_location['locationLatitude'],
             'ref': eid_location['refLocationLatitude'],
-            'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+            'metaData': metaData
             },
 
             'longitude': {
             'value': eid_location['locationLongitude'],
             'ref': eid_location['refLocationLongitude'],
-            'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+            'metaData': metaData
             },
 
             'city': {
             'value': eid_location['locationCity'],
             'ref': eid_location['refLocationCity'],
-            'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+            'metaData': metaData
             },
 
             'subnationalRegion': {
             'value': eid_location['locationSubnationalRegion'],
             'ref': eid_location['refLocationSubnationalRegion'],
-            'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+            'metaData': metaData
             },
 
             'nation': {
             'value': eid_location['locationNation'],
             'ref': eid_location['refLocationNation'],
-            'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+            'metaData': metaData
             },
 
             'continent': {
             'value': eid_location['locationContinent'],
             'ref': eid_location['refLocationContinent'],
-            'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+            'metaData': metaData
             }
         }, #locations
 
@@ -395,157 +266,73 @@ for eid in eid_events:
             'sex': {
             'value': eid['hostSex'],
             'ref': eid['refHostSex'],
-            'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+            'metaData': metaData
             },
 
             'domesticationStatus': {
             'value': eid['domesticationStatus'],
             'ref': eid['refDomesticationStatus'],
-            'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+            'metaData': metaData
             },
 
             'age': {
             'value': eid['hostAge'],
             'ref': eid['refHostAge'],
-            'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+            'metaData': metaData
             },
 
             'hostUse': {
             'value': eid['hostUse'],
             'ref': eid['refHostUse'],
-            'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+            'metaData': metaData
             },
 
             'reportedName': {
             'value': eid_host['hostReportedName'],
             'ref': eid_host['refHostReportedName'],
-            'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+            'metaData': metaData
             },
 
             'class': {
             'value': eid_host['hostClass'],
             'ref': eid_host['refHostClass'],
-            'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+            'metaData': metaData
             },
 
             'family': {
             'value': eid_host['hostFamily'],
             'ref': eid_host['refHostFamily'],
-            'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+            'metaData': metaData
             },
 
             'species': {
             'value': eid_host['hostSpecies'],
             'ref': eid_host['refHostSpecies'],
-            'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+            'metaData': metaData
             },
 
             'authority': {
             'value': eid_host['hostAuthority'],
             'ref': eid_host['refHostAuthority'],
-            'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+            'metaData': metaData
             },
 
             'taxOrder': {
             'value': eid_host['hostTaxOrder'],
             'ref': eid_host['refHostTaxOrder'],
-            'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+            'metaData': metaData
             },
 
             'genus': {
             'value': eid_host['hostGenus'],
             'ref': eid_host['refHostGenus'],
-            'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+            'metaData': metaData
             },
 
             'subSpecies': {
             'value': eid_host['hostSubSpecies'],
             'ref': eid_host['refHostSubSpecies'],
-            'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+            'metaData': metaData
             }
         }, #hosts 
         
@@ -555,39 +342,18 @@ for eid in eid_events:
                 'value': eid['startDate'],
                 'formValue': eid['startDateISO'],
                 'ref': eid['refStartDate'],
-                'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+                'metaData': metaData
             },
             'endDate':{
                 'value': eid['endDate'],
                 'formValue': eid['endDateISO'],
                 'ref': eid['refEndDate'],
-                'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+                'metaData': metaData
             },
             'duration': {
                 'value': eid['duration'],
                 'ref': eid['refDuration'],
-                'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+                'metaData': metaData
             }
         }, #dates
 
@@ -596,53 +362,25 @@ for eid in eid_events:
             'numberInfected': {
             'value': eid['numberInfected'],
             'ref': eid['refNumberInfected'],
-            'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+            'metaData': metaData
             },
 
             'prevalence': {
             'value': eid['prevalence'],
             'ref': eid['refPrevalence'],
-            'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+            'metaData': metaData
             },
 
             'symptomsReported': {
             'value': eid['symptomsReported'],
             'ref': eid['refSymptomsReported'],
-            'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+            'metaData': metaData
             },
 
             'numberOfDeaths': {
             'value': eid['numberOfDeaths'],
             'ref': eid['refNumberofDeaths'],
-            'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+            'metaData': metaData
             },
         }, #characteristics
 
@@ -657,14 +395,7 @@ for eid in eid_events:
                 'value': eid['contact'],
                 'ref': eid['refContact']
             },
-            'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+            'metaData': metaData
         }, # contacts
 
         ## Economics
@@ -672,100 +403,42 @@ for eid in eid_events:
             'avgAgeInfected': {
             'value': eid_economics['avgAgeOfInfected'],
             'ref': eid_economics['refAvgAgeOfInfected'],
-            'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()},
+            'metaData': metaData},
 
             'avgAgeDeath': {
             'value': eid_economics['avgAgeDeath'],
             'ref': eid_economics['refAvgAgeDeath'],
-            'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()},
+            'metaData': metaData},
 
             'tradeTravelRestrictions': {
             'value': eid_economics['tradeTravelRestrictions'],
             'ref': eid_economics['refTradeTravelRestrictions'],
-            'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()},
+            'metaData': metaData},
 
             'numHospitalized': {
             'value': eid_economics['numHospitalizedInEvent'],
             'ref': eid_economics['refNumHospInEvent'],
-            'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()},
+            'metaData': metaData},
 
             'avgCostPerTreatment': {
             'value': eid_economics['avgCosPerTreatmentInEvent'],
             'ref': eid_economics['refAvgCostTreatmentInEvent'],
-            'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()            
+            'metaData': metaData            
             },
 
             'perCapitaNatGDPEventYear': {
             'value': eid_economics['perCapitaNationalGDPInYearOfEvent'],
             'ref': eid_economics['refPerCapitaNationalGDPInYearOfEvent'],
-            'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+            'metaData': metaData
             },
 
             'avgLifeExpectEventCountryYear': {
             'value': eid_economics['avgLifeExpectancyInCountryAndYearOfEvent'],
             'ref': eid_economics['refAvgLifeExpectancyInCountryAndYearOfEvent'],
-            'rank':{
-                'eha':True,
-                'upvotes':0,
-                'downvotes':0,
-                },
-            'userId': 1,
-            'author': eid['reviewer'],
-            'submitted': time.time()
+            'metaData': metaData
             }
-        }, # economics
+        } # economics
 
-        'rank':{
-            'eha':True
-            },
-        'upvotes':0,
-        'downvotes':0,
-        'userId': 1,
-        'author': eid['reviewer'],
-        'submitted': time.time(),
-        'commentsCount': 0
         } #body
-    print eid_body['contacts']['blob']
+    #print eid_body['sickiID']['metaData']['reviewer']
     db.entry.insert(eid_body)
