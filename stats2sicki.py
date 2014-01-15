@@ -1,4 +1,4 @@
-import pymongo, time
+import pymongo, datetime
 
 db = pymongo.Connection('localhost', 27017)['sicki2']
 
@@ -14,7 +14,7 @@ event = db.event
 # update entries from the other collections
 eid_events = event.find()
 
-metaData = {
+meta = {
   'rank' : {
     'eha': True,
     'expert': False,
@@ -27,10 +27,10 @@ metaData = {
   },
   'userId': 0,
   'reviewer': 'eha',
-  'submitted': time.time()
+  'submitted': datetime.datetime.utcnow()
 }
 
-print metaData
+print meta
 
 
 #dates = ['startDate','startDateISO','refStartDate','endDate','endDateISO','refEndDate']
@@ -65,7 +65,8 @@ for eid in eid_events:
         id = eid.get('_id')
 
         eid_body = {
-        'metaData': {
+        # Meta Data
+        'meta': {
           'rank' : {
             'eha': True,
             'expert': False,
@@ -78,367 +79,484 @@ for eid in eid_events:
           },
           'userId': 0,
           'reviewer': eid['reviewer'],
-          'submitted': time.time()
+          'submitted': datetime.datetime.utcnow()
         },
 
+        # Calculated fields
         'commentsCount': 0, #Calculated field
         'refsCount': 0, #Calculated field
+
+        # Relational fields
         'refs': [], #Calculated field
+        'comments' : [], #Calculated field
 
-        'sickiID':{
-        'value': eid['eidID'],
-        'ref': 'jones',
-        'metaData': metaData
-        },
+        # Quoted value
+        'valQuote': {}, # original data from Jones et al SI
 
-
-
-        'eventName':{
-        'value': eid['eventName'],
-        'ref': 'jones',
-        'metaData': metaData
-        },
-
-        'disease':{
-        'value': eid['disease'],
-        'ref': eid['refDisease'],
-        'metaData': metaData
-        },
-
-        'eid':{
-        'value': eid['eid'],
-        'ref': eid['refEID'],
-        'metaData': metaData
-        },
-
-        'eidCategory':{
-        'value': eid['eidCategory'],
-        'ref': eid['refEIDCategory'],
-        'metaData': metaData
-        },
-
-        'abstract': {
-        'value': eid['Abstract'],
-        'ref': eid['refAbstract'],
-        'metaData': metaData
-        },
-
-        'notes': {
-        'value': eid['notes'],
-        'ref': eid['refNotes'],
-        'metaData': metaData
-        },
-
-        'transmissionModel': {
-        'value': eid['transitionModel'],
-        'ref': eid['refTransitionModel'],
-        'metaData': metaData
-        },
-
-        'zoonoticType': {
-        'value': eid['zoonoticType'],
-        'ref': eid['refZoonoticType'],
-        'metaData': metaData
-        },
-
-        'sampleType': {
-        'value': eid['sampleType'],
-        'ref': eid['refSampleType'],
-        'metaData': metaData
-        },
-
-        'driver': {
-        'value': eid['driver'],
-        'ref': eid['refDriver'],
-        'metaData': metaData
-        },
-
-        ## Pathogens
-        'pathogens':{
-            'drugResistance': {
-            'value': eid_pathogen['pathogenDrugResistance'],
-            'ref': eid_pathogen['refPathogenDrugResistance'],
-            'metaData': metaData
+        # Value object
+        'val' : {
+            'sickiID':{
+            'val':'',
+            'valQuote': eid['eidID'],
+            'ref': 'ehaID',
+            'meta': meta
             },
 
-            'reportedName': {
-            'value': eid_pathogen['pathogenReportedName'],
-            'ref': eid_pathogen['refPathogenReportedName'],
-            'metaData': metaData
+            'eventName':{
+            'val':'',
+            'valQuote': eid['eventName'],
+            'refBlob': eid['refEventName'],
+            'ref': [],
+            'meta': meta
             },
 
-            'class': {
-            'value': eid_pathogen['pathogenClass'],
-            'ref': eid_pathogen['refPathogenClass'],
-            'metaData': metaData
+            'disease':{
+            'val':'',
+            'valQuote': eid['disease'],
+            'ref':[],
+            'refBlob': eid['refDisease'],
+            'meta': meta
             },
 
-            'family': {
-            'value': eid_pathogen['pathogenFamily'],
-            'ref': eid_pathogen['refPathogenFamily'],
-            'metaData': metaData
+            'eid':{
+            'val':'',
+            'valQuote': eid['eid'],
+            'ref':[],
+            'refBlob': eid['refEID'],
+            'meta': meta
             },
 
-            'species': {
-            'value': eid_pathogen['pathogenSpecies'],
-            'ref': eid_pathogen['refPathogenSpecies'],
-            'metaData': metaData
+            'eidCategory':{
+            'val':'',
+            'valQuote': eid['eidCategory'],
+            'ref':[],
+            'refBlob': eid['refEIDCategory'],
+            'meta': meta
             },
 
-            'authority': {
-            'value': eid_pathogen['pathogenAuthority'],
-            'ref': eid_pathogen['refPathogenAuthority'],
-            'metaData': metaData
+            'abstract': {
+            'val':'',
+            'valQuote': eid['Abstract'],
+            'ref':[],
+            'refBlob': eid['refAbstract'],
+            'meta': meta
             },
 
-            'taxOrder': {
-            'value': eid_pathogen['pathogenTaxOrder'],
-            'ref': eid_pathogen['refPathogenTaxOrder'],
-            'metaData': metaData
+            'notes': {
+            'val':'',
+            'valQuote': eid['notes'],
+            'ref':[],
+            'refBlob': eid['refNotes'],
+            'meta': meta
             },
 
-            'genus': {
-            'value': eid_pathogen['pathogenGenus'],
-            'ref': eid_pathogen['refPathogenGenus'],
-            'metaData': metaData
+            'transmissionModel': {
+            'val':'',
+            'valQuote': eid['transitionModel'],
+            'ref':[],
+            'refBlob': eid['refTransitionModel'],
+            'meta': meta
             },
 
-            'subSpecies': {
-            'value': eid_pathogen['pathogenSubSpecies'],
-            'ref': eid_pathogen['refPathogenSubSpecies'],
-            'metaData': metaData
-            }
-        }, #pathogens
-
-        ## Locations
-        'locations':{
-            'name': {
-            'value': eid_location['locationLocationName'],
-            'ref': eid_location['refLocationLocationName'],
-            'metaData': metaData
+            'zoonoticType': {
+            'val':'',
+            'valQuote': eid['zoonoticType'],
+            'ref':[],
+            'refBlob': eid['refZoonoticType'],
+            'meta': meta
             },
 
-            'placeName': {
-            'value': eid_location['locationPlaceName'],
-            'ref': eid_location['refLocationPlaceName'],
-            'metaData': metaData
+            'sampleType': {
+            'val':'',
+            'valQuote': eid['sampleType'],
+            'ref':[],
+            'refBlob': eid['refSampleType'],
+            'meta': meta
             },
 
-            'latitude': {
-            'value': eid_location['locationLatitude'],
-            'ref': eid_location['refLocationLatitude'],
-            'metaData': metaData
+            'driver': {
+            'val':'',
+            'valQuote': eid['driver'],
+            'ref':[],
+            'refBlob': eid['refDriver'],
+            'meta': meta
             },
+                
 
-            'longitude': {
-            'value': eid_location['locationLongitude'],
-            'ref': eid_location['refLocationLongitude'],
-            'metaData': metaData
-            },
+            ## Pathogens
+            'pathogens':{
+                'drugResistance': {
+                'val':'',
+                'valQuote': eid_pathogen['pathogenDrugResistance'],
+                'ref':[],
+                'refBlob': eid_pathogen['refPathogenDrugResistance'],
+                'meta': meta
+                },
 
-            'city': {
-            'value': eid_location['locationCity'],
-            'ref': eid_location['refLocationCity'],
-            'metaData': metaData
-            },
+                'reportedName': {
+                'val':'',
+                'valQuote': eid_pathogen['pathogenReportedName'],
+                'ref':[],
+                'refBlob': eid_pathogen['refPathogenReportedName'],
+                'meta': meta
+                },
 
-            'subnationalRegion': {
-            'value': eid_location['locationSubnationalRegion'],
-            'ref': eid_location['refLocationSubnationalRegion'],
-            'metaData': metaData
-            },
+                'class': {
+                'val':'',
+                'valQuote': eid_pathogen['pathogenClass'],
+                'ref':[],
+                'refBlob': eid_pathogen['refPathogenClass'],
+                'meta': meta
+                },
 
-            'nation': {
-            'value': eid_location['locationNation'],
-            'ref': eid_location['refLocationNation'],
-            'metaData': metaData
-            },
+                'family': {
+                'val':'',
+                'valQuote': eid_pathogen['pathogenFamily'],
+                'ref':[],
+                'refBlob': eid_pathogen['refPathogenFamily'],
+                'meta': meta
+                },
 
-            'continent': {
-            'value': eid_location['locationContinent'],
-            'ref': eid_location['refLocationContinent'],
-            'metaData': metaData
-            }
-        }, #locations
+                'species': {
+                'val':'',
+                'valQuote': eid_pathogen['pathogenSpecies'],
+                'ref':[],
+                'refBlob': eid_pathogen['refPathogenSpecies'],
+                'meta': meta
+                },
 
-        ## Hosts
-        'hosts':{
-            'sex': {
-            'value': eid['hostSex'],
-            'ref': eid['refHostSex'],
-            'metaData': metaData
-            },
+                'authority': {
+                'val':'',
+                'valQuote': eid_pathogen['pathogenAuthority'],
+                'ref':[],
+                'refBlob': eid_pathogen['refPathogenAuthority'],
+                'meta': meta
+                },
 
-            'domesticationStatus': {
-            'value': eid['domesticationStatus'],
-            'ref': eid['refDomesticationStatus'],
-            'metaData': metaData
-            },
+                'taxOrder': {
+                'val':'',
+                'valQuote': eid_pathogen['pathogenTaxOrder'],
+                'ref':[],
+                'refBlob': eid_pathogen['refPathogenTaxOrder'],
+                'meta': meta
+                },
 
-            'age': {
-            'value': eid['hostAge'],
-            'ref': eid['refHostAge'],
-            'metaData': metaData
-            },
+                'genus': {
+                'val':'',
+                'valQuote': eid_pathogen['pathogenGenus'],
+                'ref':[],
+                'refBlob': eid_pathogen['refPathogenGenus'],
+                'meta': meta
+                },
 
-            'hostUse': {
-            'value': eid['hostUse'],
-            'ref': eid['refHostUse'],
-            'metaData': metaData
-            },
+                'subSpecies': {
+                'val':'',
+                'valQuote': eid_pathogen['pathogenSubSpecies'],
+                'ref':[],
+                'refBlob': eid_pathogen['refPathogenSubSpecies'],
+                'meta': meta
+                }
+            }, #pathogens
 
-            'reportedName': {
-            'value': eid_host['hostReportedName'],
-            'ref': eid_host['refHostReportedName'],
-            'metaData': metaData
-            },
+            ## Locations
+            'locations':{
+                'name': {
+                'val':'',
+                'valQuote': eid_location['locationLocationName'],
+                'ref':[],
+                'refBlob': eid_location['refLocationLocationName'],
+                'meta': meta
+                },
 
-            'class': {
-            'value': eid_host['hostClass'],
-            'ref': eid_host['refHostClass'],
-            'metaData': metaData
-            },
+                'placeName': {
+                'val':'',
+                'valQuote': eid_location['locationPlaceName'],
+                'ref':[],
+                'refBlob': eid_location['refLocationPlaceName'],
+                'meta': meta
+                },
 
-            'family': {
-            'value': eid_host['hostFamily'],
-            'ref': eid_host['refHostFamily'],
-            'metaData': metaData
-            },
+                'latitude': {
+                'val':'',
+                'valQuote': eid_location['locationLatitude'],
+                'ref':[],
+                'refBlob': eid_location['refLocationLatitude'],
+                'meta': meta
+                },
 
-            'species': {
-            'value': eid_host['hostSpecies'],
-            'ref': eid_host['refHostSpecies'],
-            'metaData': metaData
-            },
+                'longitude': {
+                'val':'',
+                'valQuote': eid_location['locationLongitude'],
+                'ref':[],
+                'refBlob': eid_location['refLocationLongitude'],
+                'meta': meta
+                },
 
-            'authority': {
-            'value': eid_host['hostAuthority'],
-            'ref': eid_host['refHostAuthority'],
-            'metaData': metaData
-            },
+                'city': {
+                'val':'',
+                'valQuote': eid_location['locationCity'],
+                'ref':[],
+                'refBlob': eid_location['refLocationCity'],
+                'meta': meta
+                },
 
-            'taxOrder': {
-            'value': eid_host['hostTaxOrder'],
-            'ref': eid_host['refHostTaxOrder'],
-            'metaData': metaData
-            },
+                'subnationalRegion': {
+                'val':'',
+                'valQuote': eid_location['locationSubnationalRegion'],
+                'ref':[],
+                'refBlob': eid_location['refLocationSubnationalRegion'],
+                'meta': meta
+                },
 
-            'genus': {
-            'value': eid_host['hostGenus'],
-            'ref': eid_host['refHostGenus'],
-            'metaData': metaData
-            },
+                'nation': {
+                'val':'',
+                'valQuote': eid_location['locationNation'],
+                'ref':[],
+                'refBlob': eid_location['refLocationNation'],
+                'meta': meta
+                },
 
-            'subSpecies': {
-            'value': eid_host['hostSubSpecies'],
-            'ref': eid_host['refHostSubSpecies'],
-            'metaData': metaData
-            }
-        }, #hosts 
-        
-        ## Dates
-        'dates':{
-            'startDate':{
-                'value': eid['startDate'],
-                'formValue': eid['startDateISO'],
-                'ref': eid['refStartDate'],
-                'metaData': metaData
-            },
-            'endDate':{
-                'value': eid['endDate'],
-                'formValue': eid['endDateISO'],
-                'ref': eid['refEndDate'],
-                'metaData': metaData
-            },
-            'duration': {
-                'value': eid['duration'],
-                'ref': eid['refDuration'],
-                'metaData': metaData
-            }
-        }, #dates
+                'continent': {
+                'val':'',
+                'valQuote': eid_location['locationContinent'],
+                'ref':[],
+                'refBlob': eid_location['refLocationContinent'],
+                'meta': meta
+                }
+            }, #locations
 
-        ## Characteristics
-        'characteristics':{
-            'numberInfected': {
-            'value': eid['numberInfected'],
-            'ref': eid['refNumberInfected'],
-            'metaData': metaData
-            },
+            ## Hosts
+            'hosts':{
+                'sex': {
+                'val':'',
+                'valQuote': eid['hostSex'],
+                'ref':[],
+                'refBlob': eid['refHostSex'],
+                'meta': meta
+                },
 
-            'prevalence': {
-            'value': eid['prevalence'],
-            'ref': eid['refPrevalence'],
-            'metaData': metaData
-            },
+                'domesticationStatus': {
+                'val':'',
+                'valQuote': eid['domesticationStatus'],
+                'ref':[],
+                'refBlob': eid['refDomesticationStatus'],
+                'meta': meta
+                },
 
-            'symptomsReported': {
-            'value': eid['symptomsReported'],
-            'ref': eid['refSymptomsReported'],
-            'metaData': metaData
-            },
+                'age': {
+                'val':'',
+                'valQuote': eid['hostAge'],
+                'ref':[],
+                'refBlob': eid['refHostAge'],
+                'meta': meta
+                },
 
-            'numberOfDeaths': {
-            'value': eid['numberOfDeaths'],
-            'ref': eid['refNumberofDeaths'],
-            'metaData': metaData
-            },
-        }, #characteristics
+                'hostUse': {
+                'val':'',
+                'valQuote': eid['hostUse'],
+                'ref':[],
+                'refBlob': eid['refHostUse'],
+                'meta': meta
+                },
 
-        ## Contacts
-        'contacts':{
-            'firstName': '',
-            'lastName': '',
-            'email': '',
-            'affiliation': '',
-            'userID': '',
-            'blob': {
-                'value': eid['contact'],
-                'ref': eid['refContact']
-            },
-            'metaData': metaData
-        }, # contacts
+                'reportedName': {
+                'val':'',
+                'valQuote': eid_host['hostReportedName'],
+                'ref':[],
+                'refBlob': eid_host['refHostReportedName'],
+                'meta': meta
+                },
 
-        ## Economics
-        'economics':{
-            'avgAgeInfected': {
-            'value': eid_economics['avgAgeOfInfected'],
-            'ref': eid_economics['refAvgAgeOfInfected'],
-            'metaData': metaData},
+                'class': {
+                'val':'',
+                'valQuote': eid_host['hostClass'],
+                'ref':[],
+                'refBlob': eid_host['refHostClass'],
+                'meta': meta
+                },
 
-            'avgAgeDeath': {
-            'value': eid_economics['avgAgeDeath'],
-            'ref': eid_economics['refAvgAgeDeath'],
-            'metaData': metaData},
+                'family': {
+                'val':'',
+                'valQuote': eid_host['hostFamily'],
+                'ref':[],
+                'refBlob': eid_host['refHostFamily'],
+                'meta': meta
+                },
 
-            'tradeTravelRestrictions': {
-            'value': eid_economics['tradeTravelRestrictions'],
-            'ref': eid_economics['refTradeTravelRestrictions'],
-            'metaData': metaData},
+                'species': {
+                'val':'',
+                'valQuote': eid_host['hostSpecies'],
+                'ref':[],
+                'refBlob': eid_host['refHostSpecies'],
+                'meta': meta
+                },
 
-            'numHospitalized': {
-            'value': eid_economics['numHospitalizedInEvent'],
-            'ref': eid_economics['refNumHospInEvent'],
-            'metaData': metaData},
+                'authority': {
+                'val':'',
+                'valQuote': eid_host['hostAuthority'],
+                'ref':[],
+                'refBlob': eid_host['refHostAuthority'],
+                'meta': meta
+                },
 
-            'avgCostPerTreatment': {
-            'value': eid_economics['avgCosPerTreatmentInEvent'],
-            'ref': eid_economics['refAvgCostTreatmentInEvent'],
-            'metaData': metaData            
-            },
+                'taxOrder': {
+                'val':'',
+                'valQuote': eid_host['hostTaxOrder'],
+                'ref':[],
+                'refBlob': eid_host['refHostTaxOrder'],
+                'meta': meta
+                },
 
-            'perCapitaNatGDPEventYear': {
-            'value': eid_economics['perCapitaNationalGDPInYearOfEvent'],
-            'ref': eid_economics['refPerCapitaNationalGDPInYearOfEvent'],
-            'metaData': metaData
-            },
+                'genus': {
+                'val':'',
+                'valQuote': eid_host['hostGenus'],
+                'ref':[],
+                'refBlob': eid_host['refHostGenus'],
+                'meta': meta
+                },
 
-            'avgLifeExpectEventCountryYear': {
-            'value': eid_economics['avgLifeExpectancyInCountryAndYearOfEvent'],
-            'ref': eid_economics['refAvgLifeExpectancyInCountryAndYearOfEvent'],
-            'metaData': metaData
-            }
-        } # economics
+                'subSpecies': {
+                'val':'',
+                'valQuote': eid_host['hostSubSpecies'],
+                'ref':[],
+                'refBlob': eid_host['refHostSubSpecies'],
+                'meta': meta
+                }
+            }, #hosts 
+            
+            ## Dates
+            'dates':{
+                'startDate':{
+                    'val':'',
+                    'valQuote': eid['startDate'],
+                    'valForm': eid['startDateISO'],
+                    'ref':[],
+                'refBlob': eid['refStartDate'],
+                    'meta': meta
+                },
+                'endDate':{
+                    'val':'',
+                    'valQuote': eid['endDate'],
+                    'valForm': eid['endDateISO'],
+                    'ref':[],
+                'refBlob': eid['refEndDate'],
+                    'meta': meta
+                },
+                'duration': {
+                    'val':'',
+                    'valQuote': eid['duration'],
+                    'ref':[],
+                'refBlob': eid['refDuration'],
+                    'meta': meta
+                }
+            }, #dates
+
+            ## Characteristics
+            'characteristics':{
+                'numberInfected': {
+                'val':'',
+                'valQuote': eid['numberInfected'],
+                'ref':[],
+                'refBlob': eid['refNumberInfected'],
+                'meta': meta
+                },
+
+                'prevalence': {
+                'val':'',
+                'valQuote': eid['prevalence'],
+                'ref':[],
+                'refBlob': eid['refPrevalence'],
+                'meta': meta
+                },
+
+                'symptomsReported': {
+                'val':'',
+                'valQuote': eid['symptomsReported'],
+                'ref':[],
+                'refBlob': eid['refSymptomsReported'],
+                'meta': meta
+                },
+
+                'numberOfDeaths': {
+                'val':'',
+                'valQuote': eid['numberOfDeaths'],
+                'ref':[],
+                'refBlob': eid['refNumberofDeaths'],
+                'meta': meta
+                },
+            }, #characteristics
+
+            ## Contacts
+            'contacts':{
+                'firstName': '',
+                'lastName': '',
+                'email': '',
+                'affiliation': '',
+                'userID': '',
+                'blob': {
+                    'val': eid['contact'],
+                    'ref':[],
+                'refBlob': eid['refContact']
+                },
+                'meta': meta
+            }, # contacts
+
+            ## Economics
+            'economics':{
+                'avgAgeInfected': {
+                'val':'',
+                'valQuote': eid_economics['avgAgeOfInfected'],
+                'ref':[],
+                'refBlob': eid_economics['refAvgAgeOfInfected'],
+                'meta': meta},
+
+                'avgAgeDeath': {
+                'val':'',
+                'valQuote': eid_economics['avgAgeDeath'],
+                'ref':[],
+                'refBlob': eid_economics['refAvgAgeDeath'],
+                'meta': meta},
+
+                'tradeTravelRestrictions': {
+                'val':'',
+                'valQuote': eid_economics['tradeTravelRestrictions'],
+                'ref':[],
+                'refBlob': eid_economics['refTradeTravelRestrictions'],
+                'meta': meta},
+
+                'numHospitalized': {
+                'val':'',
+                'valQuote': eid_economics['numHospitalizedInEvent'],
+                'ref':[],
+                'refBlob': eid_economics['refNumHospInEvent'],
+                'meta': meta},
+
+                'avgCostPerTreatment': {
+                'val':'',
+                'valQuote': eid_economics['avgCosPerTreatmentInEvent'],
+                'ref':[],
+                'refBlob': eid_economics['refAvgCostTreatmentInEvent'],
+                'meta': meta            
+                },
+
+                'perCapitaNatGDPEventYear': {
+                'val':'',
+                'valQuote': eid_economics['perCapitaNationalGDPInYearOfEvent'],
+                'ref':[],
+                'refBlob': eid_economics['refPerCapitaNationalGDPInYearOfEvent'],
+                'meta': meta
+                },
+
+                'avgLifeExpectEventCountryYear': {
+                'val':'',
+                'valQuote': eid_economics['avgLifeExpectancyInCountryAndYearOfEvent'],
+                'ref':[],
+                'refBlob': eid_economics['refAvgLifeExpectancyInCountryAndYearOfEvent'],
+                'meta': meta
+                }
+            } # economics
+        } # value object
 
         } #body
-    #print eid_body['sickiID']['metaData']['reviewer']
-    db.entry.insert(eid_body)
+    #print eid_body['sickiID']['meta']['reviewer']
+    db.entries5.insert(eid_body)
